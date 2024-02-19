@@ -1,8 +1,8 @@
 /*Write a program to implement stack operations (Array implementation). Display the appropriate messages in case of exceptions. */
 
+#include<stdbool.h>
 #include<stdio.h>
 #include<stdlib.h>
-#include<stdbool.h>
 
 typedef struct{
     char* s;
@@ -10,65 +10,44 @@ typedef struct{
     int max;
 }STACK;
 
-STACK* create(int max) {
+STACK* create(int max){
     STACK* stack = (STACK*)malloc(sizeof(STACK));
-    stack->top = -1;
     stack->max = max;
+    stack->top = -1;
     stack->s = (char*)malloc(stack->max*sizeof(char));
     return stack;
 }
 
-bool empty(STACK* stack) {
+bool empty(STACK* stack){
     return (stack->top == -1);
 }
 
-bool full(STACK* stack) {
+bool full(STACK* stack){
     return ((stack->top+1) == stack->max);
 }
 
-void xflow(STACK* stack) {
-    if(full(stack)) {
-        printf("Stack overflow\n");
-        exit(0);
-    }
-    else if(empty(stack)) {
-        printf("Stack underflow\n");
-        exit(0);
-    }
-}
-
-void push(STACK* stack, char item) {
+void push(STACK* stack, char item){
     if(full(stack)){
-        printf("Stack overflow\n");
-        exit(0);
+        printf("Stack is full. \n");
+        return;
     }
     stack->s[++stack->top] = item;
 }
 
-char pop(STACK* stack) {
-    if(empty(stack)){
-        printf("Stack underflow\n");
-        exit(0);
+char pop(STACK* stack){
+    if(empty(stack)) {
+        printf("Stack is empty. \n");
+        return '\0';
     }
-    return stack->s[stack->top--];
+    return (stack->s[stack->top--]);
 }
 
 char peek(STACK* stack){
-    if(empty(stack)){
-        printf("Stack underflow\n");
-        exit(0);
+    if(empty(stack)) {
+        printf("Stack is empty. \n");
+        return '\0';
     }
-    return stack->s[stack->top];
-}
-
-void display(STACK* stack) {
-    if(empty(stack)){
-        printf("Stack underflow\n");
-        exit(0);
-    }
-    for(int i = 0; i <= stack->top; i++) {
-        printf("%c ",stack->s[i]);
-    }
+    return (stack->s[stack->top]);
 }
 
 void liberate(STACK* stack){
@@ -76,47 +55,75 @@ void liberate(STACK* stack){
     free(stack);
 }
 
+void display(STACK* stack){
+    if(empty(stack)) {
+        printf("Stack is empty. \n");
+        return;
+    }
+    for(int i = 0; i <= stack->top; i++){
+        printf(" %c",stack->s[i]);
+    }
+    printf("\n");
+}
+
 int main() {
-    int max;
+    int choice, max;
+    char item;
     printf("Enter the maximum size of the stack: ");
     scanf("%d", &max);
     STACK* stack = create(max);
-
-    int choice;
-    char item;
-
-    while (1) {
-        printf("\nStack Operations\n");
+    
+    do {
+        printf("\nStack Operations Menu:\n");
         printf("1. Push\n");
         printf("2. Pop\n");
-        printf("3. Display\n");
-        printf("4. Exit\n");
+        printf("3. Peek\n");
+        printf("4. Check if Stack is Empty\n");
+        printf("5. Check if Stack is Full\n");
+        printf("6. Display Stack\n");
+        printf("7. Exit\n");
         printf("Enter your choice: ");
         scanf("%d", &choice);
 
-        switch (choice) {
+        switch(choice) {
             case 1:
-                printf("Enter item to push: ");
+                printf("Enter the item to push: ");
                 scanf(" %c", &item);
                 push(stack, item);
-                printf("Item %c pushed into the stack.\n", item);
                 break;
-            case 2:                
+            case 2:
                 item = pop(stack);
-                printf("Item %c popped from the stack.\n", item);                
+                if(item != '\0')
+                    printf("Popped item: %c\n", item);
                 break;
             case 3:
-                printf("Stack contents: ");
-                display(stack);
-                printf("\n");
+                item = peek(stack);
+                if(item != '\0')
+                    printf("Top item: %c\n", item);
                 break;
             case 4:
+                if(empty(stack))
+                    printf("Stack is empty.\n");
+                else
+                    printf("Stack is not empty.\n");
+                break;
+            case 5:
+                if(full(stack))
+                    printf("Stack is full.\n");
+                else
+                    printf("Stack is not full.\n");
+                break;
+            case 6:
+                display(stack);
+                break;
+            case 7:
                 printf("Exiting program.\n");
-                exit(0);
+                break;
             default:
-                printf("Invalid choice. Please enter a number between 1 and 4.\n");
+                printf("Invalid choice. Please enter a valid choice.\n");
         }
-    }
+    } while(choice != 7);
 
+    liberate(stack);
     return 0;
 }

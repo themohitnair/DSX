@@ -4,34 +4,34 @@
 #include<stdlib.h>
 #include<stdbool.h>
 
-typedef struct {
+typedef struct{
     int* q;
     int f;
     int r;
     int max;
-}QUEUE;
+} QUEUE;
 
 QUEUE* create(int max) {
     QUEUE* queue = (QUEUE*)malloc(sizeof(QUEUE));
-    queue->max = max;
     queue->f = 0;
     queue->r = -1;
-    queue->q = (int*)malloc((queue->max)*sizeof(int));
+    queue->max = max;
+    queue->q = (int*)malloc(queue->max*sizeof(int));
     return queue;
+}
+
+bool full(QUEUE* queue){
+    return ((queue->r+1) == queue->max);
 }
 
 bool empty(QUEUE* queue){
     return (queue->f > queue->r);
 }
 
-bool full(QUEUE* queue) {
-    return ((queue->max - 1) == queue->r);
-}
-
-void enqueue(QUEUE* queue, int item) {
-    if(full(queue)) {
+void enqueue(QUEUE* queue, int item){
+    if(full(queue)){
         printf("Queue is full.\n");
-        exit(0);
+        return;
     }
     queue->q[++queue->r] = item;
 }
@@ -39,38 +39,36 @@ void enqueue(QUEUE* queue, int item) {
 int dequeue(QUEUE* queue) {
     if(empty(queue)) {
         printf("Queue is empty.\n");
-        exit(0);
+        return -1;
     }
-    return (queue->q[queue->f++]);
+    return queue->q[queue->f++];
 }
 
-void display(QUEUE* queue){
-    if(empty(queue)) {
-        printf("Queue is empty.\n");
-        exit(0);
-    }
-    for(int i = queue->f; i <= queue->r; i++){
-        printf("%d ",queue->q[i]);
-    }
-    printf("\n");
-}
-
-void liberate(QUEUE* queue) {
+void liberate(QUEUE* queue){
     free(queue->q);
     free(queue);
 }
 
+void display(QUEUE* queue) {
+    if(empty(queue)){
+        printf("Queue is full.\n");
+        return;
+    }
+    for(int i = queue->f; i <= queue->r; i++){
+        printf(" %d", queue->q[i]);
+    }
+    printf("\n");
+}
+
 int main() {
-    int choice, item, max_size;
-    QUEUE* queue = NULL;
+    int choice, item, size;
+    printf("Enter the size of the queue: ");
+    scanf("%d", &size);
 
-    printf("Enter the maximum size of the queue: ");
-    scanf("%d", &max_size);
+    QUEUE* queue = create(size);
 
-    queue = create(max_size);
-
-    while (1) {
-        printf("\nQueue Operations:\n");
+    do {
+        printf("\nQueue Operations\n");
         printf("1. Enqueue\n");
         printf("2. Dequeue\n");
         printf("3. Display\n");
@@ -80,24 +78,27 @@ int main() {
 
         switch (choice) {
             case 1:
-                printf("Enter the element to enqueue: ");
+                printf("Enter the item to enqueue: ");
                 scanf("%d", &item);
                 enqueue(queue, item);
                 break;
             case 2:
                 item = dequeue(queue);
-                printf("Dequeued element: %d\n", item);
+                if (item != -1)
+                    printf("Dequeued item: %d\n", item);
                 break;
             case 3:
+                printf("Queue elements: ");
                 display(queue);
                 break;
             case 4:
-                liberate(queue);
-                exit(0);
+                printf("Exiting...\n");
+                break;
             default:
-                printf("Invalid choice! Please enter a valid option.\n");
+                printf("Invalid choice!\n");
         }
-    }
+    } while (choice != 4);
 
+    liberate(queue);
     return 0;
 }
